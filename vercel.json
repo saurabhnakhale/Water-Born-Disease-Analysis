@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "name": "nmc-add-surveillance-dashboard",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
+  ]
+}
