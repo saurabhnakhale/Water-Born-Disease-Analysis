@@ -1,0 +1,16 @@
+# Scratch and temporary scripts
+dump_samples.ps1
+dump_detailed.ps1
+inspect_detail.ps1
+extract_data.ps1
+standardize_data.ps1
+make_data_js.ps1
+test_http.ps1
+check_stats.ps1
+read_sheets.ps1
+find_git.ps1
+find_git_deep.ps1
+data.json
+
+# Excel raw source (optional, ignore if not needed in repo or keep if small)
+# ADD_Jul_2025_to_August_2026.xlsx
