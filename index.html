@@ -249,6 +249,32 @@
       animation: spin 0.8s linear infinite;
     }
 
+    .sync-live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #34d399;
+      user-select: none;
+    }
+    .sync-live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: livePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
     /* Subheader & Global Filter Controls */
     .filter-bar {
       display: flex;
@@ -1001,7 +1027,11 @@
       </nav>
 
       <div class="navbar-actions">
-        <button class="btn-action" id="btn-refresh-data" onclick="refreshDashboardData()" title="Refresh Surveillance Data">
+        <div class="sync-live-pill" id="sync-live-status" title="Live Auto-Sync Active: Automatically monitors connected Google Sheet for updates every 30 seconds">
+          <span class="sync-live-dot"></span>
+          <span id="sync-live-label">Google Sheet Live</span>
+        </div>
+        <button class="btn-action" id="btn-refresh-data" onclick="refreshDashboardData(true)" title="Refresh & Fetch Latest Google Sheet Data">
           <i data-lucide="refresh-cw" id="icon-refresh-data"></i> Refresh Data
         </button>
         <button class="btn-action" onclick="exportFilteredData()" title="Download Clean Dataset">
@@ -1626,11 +1656,13 @@
 
   <!-- Embedded Clean Data Bundle -->
   <script src="data.js"></script>
+  <!-- Google Sheet Live Synchronizer -->
+  <script src="sync.js"></script>
 
   <!-- Main Application Logic -->
   <script>
     // State management
-    const rawData = window.SURVEILLANCE_DATA;
+    let rawData = window.SURVEILLANCE_DATA;
     let currentFilters = {
       months: [],       // Array of selected month strings e.g. ["Jul 2025", "Aug 2025"], empty = all
       dateFrom: '',     // YYYY-MM-DD
@@ -1702,6 +1734,7 @@
       updateDashboardData();
       initMap();
       lucide.createIcons();
+      startAutoSync();
     });
 
     // Populate Multi-Select Filter Dropdowns & Diagnosis Pill Counts
@@ -1943,27 +1976,76 @@
       updateDashboardData();
     }
 
-    // Refresh Data Action
-    function refreshDashboardData() {
+    // Last known data fingerprint
+    let lastDataFingerprint = window.GoogleSheetLiveSync ? window.GoogleSheetLiveSync.computeFingerprint(rawData) : '';
+    let autoSyncTimer = null;
+
+    // Refresh Data Action with live Google Sheet fetch
+    async function refreshDashboardData(isManual = false) {
       const btn = document.getElementById('btn-refresh-data');
       const icon = document.getElementById('icon-refresh-data');
-      if (icon) icon.classList.add('spin');
-      if (btn) btn.disabled = true;
+      const liveLabel = document.getElementById('sync-live-label');
+      
+      if (isManual) {
+        if (icon) icon.classList.add('spin');
+        if (btn) btn.disabled = true;
+        if (liveLabel) liveLabel.textContent = 'Syncing...';
+      }
 
-      // Reset filters and re-render dashboard data with animation
-      setTimeout(() => {
-        resetAllFilters();
-        if (icon) icon.classList.remove('spin');
-        if (btn) btn.disabled = false;
-        
-        // Show subtle notification toast or alert in ticker
-        const ticker = document.getElementById('ticker-text');
-        if (ticker) {
-          const prevTicker = ticker.innerHTML;
-          ticker.innerHTML = '<span style="color:#10b981;font-weight:700;">&#10003; Data refreshed and synchronized successfully</span> &nbsp;&bull;&nbsp; ' + prevTicker;
-          setTimeout(() => setupTicker(), 4000);
+      try {
+        if (window.GoogleSheetLiveSync && window.GoogleSheetLiveSync.fetchLiveGoogleSheetData) {
+          const freshData = await window.GoogleSheetLiveSync.fetchLiveGoogleSheetData();
+          const newFingerprint = window.GoogleSheetLiveSync.computeFingerprint(freshData);
+
+          if (newFingerprint !== lastDataFingerprint || isManual) {
+            const hasChanged = newFingerprint !== lastDataFingerprint;
+            lastDataFingerprint = newFingerprint;
+            rawData = freshData;
+            window.SURVEILLANCE_DATA = freshData;
+
+            // Re-render dropdown counts & pills
+            initFilterDropdowns();
+            setupTicker();
+            updateDashboardData();
+
+            // Notify user
+            const ticker = document.getElementById('ticker-text');
+            if (ticker) {
+              const msg = hasChanged
+                ? '<span style="color:#10b981;font-weight:700;">&#10003; Live Update: New Google Sheet records detected & synchronized!</span>'
+                : '<span style="color:#10b981;font-weight:700;">&#10003; Data synchronized with live Google Sheet</span>';
+              ticker.innerHTML = msg + ' &nbsp;&bull;&nbsp; ' + ticker.innerHTML;
+              setTimeout(() => setupTicker(), 5000);
+            }
+          }
         }
-      }, 500);
+      } catch (err) {
+        console.warn('Google Sheet live sync check notice:', err);
+        if (isManual) {
+          resetAllFilters();
+        }
+      } finally {
+        if (isManual) {
+          if (icon) icon.classList.remove('spin');
+          if (btn) btn.disabled = false;
+        }
+        if (liveLabel) {
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          liveLabel.textContent = `Live Synced ${timeStr}`;
+        }
+      }
+    }
+
+    // Start background auto-poll (checks Google Sheet every 30 seconds)
+    function startAutoSync() {
+      if (autoSyncTimer) clearInterval(autoSyncTimer);
+      // Run initial background sync check after 3 seconds
+      setTimeout(() => refreshDashboardData(false), 3000);
+      // Then check every 30 seconds
+      autoSyncTimer = setInterval(() => {
+        refreshDashboardData(false);
+      }, 30000);
     }
 
     function resetAllFilters() {
