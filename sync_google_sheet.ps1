@@ -77,18 +77,18 @@ function Format-MonthKey($dt, $rawMonth) {
     $s = $rawMonth.ToString().Trim().ToLower()
     if ($s -match 'jul.*25') { return "2025-07" }
     if ($s -match 'aug.*25') { return "2025-08" }
-    if ($s -match 'sep.*25') { return "2025-09" }
-    if ($s -match 'oct.*25') { return "2025-10" }
-    if ($s -match 'nov.*25') { return "2025-11" }
-    if ($s -match 'dec.*25') { return "2025-12" }
-    if ($s -match 'jan.*26') { return "2026-01" }
-    if ($s -match 'feb.*26') { return "2026-02" }
-    if ($s -match 'mar.*26') { return "2026-03" }
-    if ($s -match 'apr.*26') { return "2026-04" }
-    if ($s -match 'may.*26') { return "2026-05" }
-    if ($s -match 'jun.*26') { return "2026-06" }
-    if ($s -match 'jul.*26') { return "2026-07" }
-    if ($s -match 'aug.*26') { return "2026-08" }
+    if ($s -match 'sep.*25' -or $s -eq 'september') { return "2025-09" }
+    if ($s -match 'oct.*25' -or $s -eq 'october') { return "2025-10" }
+    if ($s -match 'nov.*25' -or $s -eq 'november') { return "2025-11" }
+    if ($s -match 'dec.*25' -or $s -eq 'december') { return "2025-12" }
+    if ($s -match 'jan.*26' -or $s -eq 'january') { return "2026-01" }
+    if ($s -match 'feb.*26' -or $s -eq 'february') { return "2026-02" }
+    if ($s -match 'mar.*26' -or $s -eq 'march') { return "2026-03" }
+    if ($s -match 'apr.*26' -or $s -eq 'april') { return "2026-04" }
+    if ($s -match 'may.*26' -or $s -eq 'may') { return "2026-05" }
+    if ($s -match 'jun.*26' -or $s -eq 'june') { return "2026-06" }
+    if ($s -match 'jul.*26' -or $s -eq 'july') { return "2026-07" }
+    if ($s -match 'aug.*26' -or $s -eq 'august') { return "2026-08" }
     if ($s -match 'sep.*26') { return "2026-09" }
     return $rawMonth
 }

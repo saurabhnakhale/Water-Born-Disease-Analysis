@@ -1,7 +1,7 @@
 ﻿window.SURVEILLANCE_DATA = {
     "metadata":  {
                      "title":  "NMC Water-Borne Disease \u0026 ADD Surveillance Intelligence Data",
-                     "generatedAt":  "2026-10-28T11:46:28+05:30",
+                     "generatedAt":  "2026-10-28T12:37:57+05:30",
                      "source":  "Google Sheets (Live Connected)",
                      "sheetUrl":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQjC8StN7a2den66UIrHOhljHBeF8mASD_j6Fmu5C5xNEp2tWbkV_YDgTMzKujFjPni4u-T4GWj1Thn/pub",
                      "totalLinelist":  526,
@@ -9,7 +9,7 @@
                      "totalEvents":  17,
                      "totalOutbreaks":  5,
                      "totalWaterSamples":  832,
-                     "totalNotPotableWater":  347
+                     "totalNotPotableWater":  346
                  },
     "linelist":  [
                      {
@@ -9782,24 +9782,24 @@
                                    "contaminationRate":  44.4
                                },
                                {
-                                   "monthKey":  "September",
-                                   "month":  "September",
+                                   "monthKey":  "2025-09",
+                                   "month":  "Sep 2025",
                                    "sent":  77,
                                    "potable":  50,
                                    "notPotable":  27,
                                    "contaminationRate":  35.1
                                },
                                {
-                                   "monthKey":  "October",
-                                   "month":  "October",
+                                   "monthKey":  "2025-10",
+                                   "month":  "Oct 2025",
                                    "sent":  41,
                                    "potable":  39,
                                    "notPotable":  2,
                                    "contaminationRate":  4.9
                                },
                                {
-                                   "monthKey":  "November",
-                                   "month":  "November",
+                                   "monthKey":  "2025-11",
+                                   "month":  "Nov 2025",
                                    "sent":  48,
                                    "potable":  46,
                                    "notPotable":  2,
@@ -9858,8 +9858,8 @@
                                    "month":  "Jul 2026",
                                    "sent":  185,
                                    "potable":  39,
-                                   "notPotable":  145,
-                                   "contaminationRate":  78.4
+                                   "notPotable":  144,
+                                   "contaminationRate":  77.8
                                },
                                {
                                    "monthKey":  "2026-08",
