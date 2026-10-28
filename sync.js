@@ -353,60 +353,41 @@ window.GoogleSheetLiveSync = (function() {
       });
     }
 
-    // 5. Process Water Samples
+    // 5. Process Water Samples (Extract from individual monthly tables for 100% accuracy)
     const waterRows = parseCSV(waterCsv);
-    let statsHeaderIdx = -1;
-    for (let i = 0; i < waterRows.length; i++) {
-      if (waterRows[i].some(cell => /Water sample Statistics/i.test(cell))) {
-        statsHeaderIdx = i + 1;
-        break;
-      }
-    }
-
-    const waterMonthly = [];
-    if (statsHeaderIdx > 0 && statsHeaderIdx + 3 < waterRows.length) {
-      const monthCols = waterRows[statsHeaderIdx];
-      const sentCols = waterRows[statsHeaderIdx + 1];
-      const notPotCols = waterRows[statsHeaderIdx + 2];
-      const potCols = waterRows[statsHeaderIdx + 3];
-
-      for (let c = 1; c < monthCols.length; c++) {
-        const mName = (monthCols[c] || '').trim();
-        if (!mName) continue;
-
-        const sent = parseInt((sentCols[c] || '').replace(/\D/g, ''), 10) || 0;
-        const notPot = parseInt((notPotCols[c] || '').replace(/\D/g, ''), 10) || 0;
-        const pot = parseInt((potCols[c] || '').replace(/\D/g, ''), 10) || 0;
-
-        const mKey = formatMonthKey(null, mName);
-        const mLabel = formatMonthLabel(mKey);
-        const rate = sent > 0 ? parseFloat(((notPot / sent) * 100).toFixed(1)) : 0.0;
-
-        waterMonthly.push({
-          monthKey: mKey,
-          month: mLabel,
-          sent: sent,
-          potable: pot,
-          notPotable: notPot,
-          contaminationRate: rate
-        });
-      }
-    }
-
-    // 6. Process Zonewise Water Samples
+    const waterMonthlyMap = {};
     const wsZonewise = [];
     let currMonthKey = "";
-    for (let i = 6; i < waterRows.length; i++) {
+
+    for (let i = 0; i < waterRows.length; i++) {
       const r = waterRows[i];
       if (!r || r.length === 0) continue;
       const col0 = (r[0] || '').trim();
 
-      if (/^(Aug|Sep|Oct|Nov|Dec|Jan|Feb|Mar|Apr|May|Jun|Jul)-[0-9]{2}/i.test(col0)) {
+      const mMatch = col0.match(/^(Aug|Sep|Oct|Nov|Dec|Jan|Feb|Mar|Apr|May|Jun|Jul)-[0-9]{2}/i);
+      if (mMatch) {
         currMonthKey = formatMonthKey(null, col0);
         continue;
       }
 
-      if (/^Zone\s*(\d+)/i.test(col0)) {
+      if (col0.toLowerCase() === 'total' && currMonthKey) {
+        const sent = parseInt((r[2] || '').trim(), 10) || 0;
+        const pot = parseInt((r[3] || '').trim(), 10) || 0;
+        const notPot = parseInt((r[4] || '').trim(), 10) || 0;
+        const rate = sent > 0 ? parseFloat(((notPot / sent) * 100).toFixed(1)) : 0.0;
+
+        waterMonthlyMap[currMonthKey] = {
+          monthKey: currMonthKey,
+          month: formatMonthLabel(currMonthKey),
+          sent: sent,
+          potable: pot,
+          notPotable: notPot,
+          contaminationRate: rate
+        };
+        continue;
+      }
+
+      if (/^Zone\s*(\d+)/i.test(col0) && currMonthKey) {
         const z = standardizeZone(col0);
         const zn = (r[1] || '').trim() || ZONE_NAMES[z] || z;
         const sentVal = parseInt((r[2] || '').trim(), 10) || 0;
@@ -426,6 +407,11 @@ window.GoogleSheetLiveSync = (function() {
         });
       }
     }
+
+    const monthChronology = ["2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07","2026-08"];
+    const waterMonthly = monthChronology
+      .filter(k => waterMonthlyMap[k])
+      .map(k => waterMonthlyMap[k]);
 
     return {
       metadata: {

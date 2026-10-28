@@ -294,58 +294,17 @@ foreach ($r in $outbreaksRaw) {
 }
 Write-Host "Processed $($outbreaks.Count) outbreaks."
 
-# 5. Parse Water Sample Stats from WaterSample.csv
+# 5. Parse Water Sample Stats from individual monthly section tables for 100% accuracy
 Write-Host "Processing Water Sample Data..."
 $waterLines = Get-Content (Join-Path $tempDir "WaterSample.csv")
 
-# Find monthly statistics row
-$statsHeaderIdx = -1
-for ($i=0; $i -lt $waterLines.Count; $i++) {
-    if ($waterLines[$i] -match 'Water sample Statistics') {
-        $statsHeaderIdx = $i + 1
-        break
-    }
-}
-
-$waterMonthly = @()
-if ($statsHeaderIdx -gt 0 -and $statsHeaderIdx + 3 -lt $waterLines.Count) {
-    $monthCols = $waterLines[$statsHeaderIdx] -split ','
-    $sentCols = $waterLines[$statsHeaderIdx + 1] -split ','
-    $notPotCols = $waterLines[$statsHeaderIdx + 2] -split ','
-    $potCols = $waterLines[$statsHeaderIdx + 3] -split ','
-
-    for ($c=1; $c -lt $monthCols.Count; $c++) {
-        $mName = $monthCols[$c].Trim()
-        if (-not $mName) { continue }
-
-        $sent = [int]($sentCols[$c].Trim() -replace '\D','')
-        $notPot = [int]($notPotCols[$c].Trim() -replace '\D','')
-        $pot = [int]($potCols[$c].Trim() -replace '\D','')
-
-        $mKey = Format-MonthKey $null $mName
-        $mLabel = Format-MonthLabel $mKey
-
-        $rate = if ($sent -gt 0) { [Math]::Round(($notPot / $sent) * 100, 1) } else { 0.0 }
-
-        $waterMonthly += [PSCustomObject]@{
-            monthKey = $mKey
-            month = $mLabel
-            sent = $sent
-            potable = $pot
-            notPotable = $notPot
-            contaminationRate = $rate
-        }
-    }
-}
-Write-Host "Processed $($waterMonthly.Count) water monthly stats."
-
-# 6. Parse Zonewise Water Samples
-Write-Host "Processing Zonewise Water Sample Data..."
+$waterMonthlyMap = @{}
 $wsZonewise = @()
 $currMonthKey = ""
 
-for ($i=6; $i -lt $waterLines.Count; $i++) {
+for ($i=0; $i -lt $waterLines.Count; $i++) {
     $line = $waterLines[$i]
+    if (-not $line -or $line.Trim() -eq "") { continue }
     $cols = $line -split ','
     if ($cols.Count -lt 1) { continue }
     $col0 = $cols[0].Trim()
@@ -355,7 +314,24 @@ for ($i=6; $i -lt $waterLines.Count; $i++) {
         continue
     }
 
-    if ($col0 -match '^Zone\s*(\d+)') {
+    if ($col0.ToLower() -eq 'total' -and $currMonthKey) {
+        $sentVal = if ($cols.Count -gt 2 -and $cols[2].Trim() -match '^\d+') { [int]$cols[2].Trim() } else { 0 }
+        $potVal = if ($cols.Count -gt 3 -and $cols[3].Trim() -match '^\d+') { [int]$cols[3].Trim() } else { 0 }
+        $notPotVal = if ($cols.Count -gt 4 -and $cols[4].Trim() -match '^\d+') { [int]$cols[4].Trim() } else { 0 }
+        $rate = if ($sentVal -gt 0) { [Math]::Round(($notPotVal / $sentVal) * 100, 1) } else { 0.0 }
+
+        $waterMonthlyMap[$currMonthKey] = [PSCustomObject]@{
+            monthKey = $currMonthKey
+            month = Format-MonthLabel $currMonthKey
+            sent = $sentVal
+            potable = $potVal
+            notPotable = $notPotVal
+            contaminationRate = $rate
+        }
+        continue
+    }
+
+    if ($col0 -match '^Zone\s*(\d+)' -and $currMonthKey) {
         $z = Standardize-Zone $col0
         $zn = if ($cols.Count -gt 1 -and $cols[1].Trim() -ne "") { $cols[1].Trim() } else { $zoneNames[$z] }
         $sentVal = if ($cols.Count -gt 2 -and $cols[2].Trim() -match '^\d+') { [int]$cols[2].Trim() } else { 0 }
@@ -376,6 +352,15 @@ for ($i=6; $i -lt $waterLines.Count; $i++) {
         }
     }
 }
+
+$monthChronology = @("2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07","2026-08")
+$waterMonthly = @()
+foreach ($mk in $monthChronology) {
+    if ($waterMonthlyMap.ContainsKey($mk)) {
+        $waterMonthly += $waterMonthlyMap[$mk]
+    }
+}
+Write-Host "Processed $($waterMonthly.Count) water monthly stats."
 Write-Host "Processed $($wsZonewise.Count) zonewise water sample entries."
 
 # Clean up temp folder

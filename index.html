@@ -2121,6 +2121,37 @@
       document.getElementById('kpi-outbreaks').textContent = filteredOutbreaks.length;
       document.getElementById('kpi-events').textContent = filteredEvents.length;
 
+      // Dynamic Water Contamination Rate KPI based on active Month and Zone filters
+      let totalSamplesSent = 0;
+      let totalSamplesNotPotable = 0;
+
+      if (hasZoneFilter) {
+        // If specific zones are selected, aggregate from waterSampleZonewise
+        rawData.waterSampleZonewise.forEach(w => {
+          if (!currentFilters.zones.includes(w.zone)) return;
+          if (hasMonthFilter && !currentFilters.months.includes(w.month)) return;
+          totalSamplesSent += w.sent;
+          totalSamplesNotPotable += w.notPotable;
+        });
+      } else if (hasMonthFilter) {
+        // If only months are filtered, aggregate from waterSampleMonthly
+        rawData.waterSampleMonthly.forEach(w => {
+          if (!currentFilters.months.includes(w.month)) return;
+          totalSamplesSent += w.sent;
+          totalSamplesNotPotable += w.notPotable;
+        });
+      } else {
+        // City-wide across all months
+        totalSamplesSent = rawData.metadata.totalWaterSamples || rawData.waterSampleMonthly.reduce((acc, w) => acc + w.sent, 0);
+        totalSamplesNotPotable = rawData.metadata.totalNotPotableWater || rawData.waterSampleMonthly.reduce((acc, w) => acc + w.notPotable, 0);
+      }
+
+      const activeContamRate = totalSamplesSent > 0 ? ((totalSamplesNotPotable / totalSamplesSent) * 100).toFixed(1) : '0.0';
+      const kpiRateEl = document.getElementById('kpi-water-rate');
+      const kpiSamplesEl = document.getElementById('kpi-water-samples');
+      if (kpiRateEl) kpiRateEl.textContent = `${activeContamRate}%`;
+      if (kpiSamplesEl) kpiSamplesEl.textContent = `${totalSamplesNotPotable} of ${totalSamplesSent} Non-Potable`;
+
       // Render Charts & Tables
       renderOverviewCharts();
       renderTrendsCharts();
@@ -2679,7 +2710,7 @@
             }
           },
           scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', callback: v => v + '%' }, max: 50 },
+            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', callback: v => v + '%' }, min: 0, max: 100, stepSize: 20 },
             y: { grid: { display: false }, ticks: { color: '#cbd5e1' } }
           }
         }

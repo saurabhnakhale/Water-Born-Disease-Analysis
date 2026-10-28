@@ -1,15 +1,15 @@
 ﻿window.SURVEILLANCE_DATA = {
     "metadata":  {
                      "title":  "NMC Water-Borne Disease \u0026 ADD Surveillance Intelligence Data",
-                     "generatedAt":  "2026-10-28T12:37:57+05:30",
+                     "generatedAt":  "2026-10-28T13:40:43+05:30",
                      "source":  "Google Sheets (Live Connected)",
                      "sheetUrl":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQjC8StN7a2den66UIrHOhljHBeF8mASD_j6Fmu5C5xNEp2tWbkV_YDgTMzKujFjPni4u-T4GWj1Thn/pub",
                      "totalLinelist":  526,
                      "totalHighRiskAreas":  94,
                      "totalEvents":  17,
                      "totalOutbreaks":  5,
-                     "totalWaterSamples":  832,
-                     "totalNotPotableWater":  346
+                     "totalWaterSamples":  899,
+                     "totalNotPotableWater":  161
                  },
     "linelist":  [
                      {
@@ -9806,6 +9806,14 @@
                                    "contaminationRate":  4.2
                                },
                                {
+                                   "monthKey":  "2025-12",
+                                   "month":  "Dec 2025",
+                                   "sent":  67,
+                                   "potable":  63,
+                                   "notPotable":  4,
+                                   "contaminationRate":  6
+                               },
+                               {
                                    "monthKey":  "2026-01",
                                    "month":  "Jan 2026",
                                    "sent":  20,
@@ -9825,7 +9833,7 @@
                                    "monthKey":  "2026-03",
                                    "month":  "Mar 2026",
                                    "sent":  103,
-                                   "potable":  83,
+                                   "potable":  82,
                                    "notPotable":  21,
                                    "contaminationRate":  20.4
                                },
@@ -9849,25 +9857,25 @@
                                    "monthKey":  "2026-06",
                                    "month":  "Jun 2026",
                                    "sent":  42,
-                                   "potable":  13,
-                                   "notPotable":  29,
-                                   "contaminationRate":  69
+                                   "potable":  29,
+                                   "notPotable":  13,
+                                   "contaminationRate":  31
                                },
                                {
                                    "monthKey":  "2026-07",
                                    "month":  "Jul 2026",
                                    "sent":  185,
-                                   "potable":  39,
-                                   "notPotable":  144,
-                                   "contaminationRate":  77.8
+                                   "potable":  145,
+                                   "notPotable":  39,
+                                   "contaminationRate":  21.1
                                },
                                {
                                    "monthKey":  "2026-08",
                                    "month":  "Aug 2026",
                                    "sent":  82,
-                                   "potable":  7,
-                                   "notPotable":  75,
-                                   "contaminationRate":  91.5
+                                   "potable":  75,
+                                   "notPotable":  7,
+                                   "contaminationRate":  8.5
                                }
                            ],
     "waterSampleZonewise":  [
