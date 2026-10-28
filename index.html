@@ -288,6 +288,154 @@
       border-color: var(--primary);
     }
 
+    /* Custom Multi-Select Dropdown Component */
+    .multiselect-dropdown {
+      position: relative;
+      display: inline-block;
+      user-select: none;
+    }
+
+    .multiselect-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-family: var(--font-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      min-width: 190px;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+
+    .multiselect-btn:hover, .multiselect-btn.active {
+      border-color: var(--primary);
+      background: rgba(30, 41, 59, 0.95);
+    }
+
+    .multiselect-btn .btn-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 170px;
+      text-align: left;
+    }
+
+    .multiselect-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 250px;
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 14px 35px -5px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px);
+      z-index: 1100;
+      display: none;
+      padding: 8px;
+    }
+
+    .multiselect-menu.show {
+      display: block;
+      animation: fadeInDown 0.15s ease-out;
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .multiselect-actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 6px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 6px;
+      font-size: 0.74rem;
+    }
+
+    .multiselect-action-btn {
+      background: transparent;
+      border: none;
+      color: var(--primary);
+      font-weight: 600;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      transition: background 0.15s;
+    }
+
+    .multiselect-action-btn:hover {
+      background: rgba(6, 182, 212, 0.15);
+      color: #fff;
+    }
+
+    .multiselect-list {
+      max-height: 240px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-right: 4px;
+    }
+
+    .multiselect-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      transition: background 0.15s;
+    }
+
+    .multiselect-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .multiselect-item input[type="checkbox"] {
+      accent-color: var(--primary);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+
+    .multiselect-item-count {
+      margin-left: auto;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1px 6px;
+      border-radius: 9999px;
+    }
+
+    /* Date range controls */
+    .date-input {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-family: var(--font-main);
+      outline: none;
+      transition: border 0.2s;
+      color-scheme: dark;
+    }
+
+    .date-input:focus {
+      border-color: var(--primary);
+    }
+
     .filter-pills {
       display: flex;
       gap: 6px;
@@ -861,31 +1009,69 @@
     <!-- Global Filter Bar -->
     <div class="filter-bar">
       <div class="filter-group">
-        <span class="filter-label"><i data-lucide="calendar" style="width:14px;height:14px"></i> Period:</span>
-        <select id="filter-month" class="select-input" onchange="applyFilters()">
-          <option value="ALL">All Reporting Months (14 Months)</option>
-        </select>
+        <!-- Date & Month Calendar Filter with Multiple Selection -->
+        <span class="filter-label"><i data-lucide="calendar" style="width:14px;height:14px"></i> Date & Month:</span>
+        <div class="multiselect-dropdown" id="month-multiselect">
+          <button type="button" class="multiselect-btn" id="month-multiselect-btn" onclick="toggleDropdown('month-multiselect-menu', event)">
+            <span class="btn-text" id="month-multiselect-label">All Months (15 Selected)</span>
+            <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
+          </button>
+          <div class="multiselect-menu" id="month-multiselect-menu">
+            <div class="multiselect-actions-bar">
+              <span style="font-weight:600;color:var(--text-secondary);">Select Months</span>
+              <div>
+                <button type="button" class="multiselect-action-btn" onclick="selectAllMonths(true)">All</button>
+                <button type="button" class="multiselect-action-btn" onclick="selectAllMonths(false)">None</button>
+              </div>
+            </div>
+            <div class="multiselect-list" id="month-checkbox-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
 
+        <!-- Optional Exact Date Range Calendar -->
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(30,41,59,0.5);padding:3px 8px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle)">
+          <span style="font-size:0.72rem;color:var(--text-muted);">From:</span>
+          <input type="date" id="filter-date-from" class="date-input" onchange="applyFilters()" title="Filter admission date from" />
+          <span style="font-size:0.72rem;color:var(--text-muted);">To:</span>
+          <input type="date" id="filter-date-to" class="date-input" onchange="applyFilters()" title="Filter admission date to" />
+          <button type="button" class="multiselect-action-btn" onclick="clearDateRange()" title="Clear exact date range" style="font-size:0.7rem;padding:2px 4px;">Clear</button>
+        </div>
+
+        <!-- Zone Multi-Select Filter -->
         <span class="filter-label" style="margin-left:8px"><i data-lucide="map" style="width:14px;height:14px"></i> Zone:</span>
-        <select id="filter-zone" class="select-input" onchange="applyFilters()">
-          <option value="ALL">All Zones (City-Wide)</option>
-        </select>
-
-        <span class="filter-label" style="margin-left:8px"><i data-lucide="stethoscope" style="width:14px;height:14px"></i> Diagnosis:</span>
-        <select id="filter-diagnosis" class="select-input" onchange="applyFilters()">
-          <option value="ALL">All Diagnoses</option>
-        </select>
+        <div class="multiselect-dropdown" id="zone-multiselect">
+          <button type="button" class="multiselect-btn" id="zone-multiselect-btn" onclick="toggleDropdown('zone-multiselect-menu', event)">
+            <span class="btn-text" id="zone-multiselect-label">All Zones (City-Wide)</span>
+            <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
+          </button>
+          <div class="multiselect-menu" id="zone-multiselect-menu">
+            <div class="multiselect-actions-bar">
+              <span style="font-weight:600;color:var(--text-secondary);">Select Zones</span>
+              <div>
+                <button type="button" class="multiselect-action-btn" onclick="selectAllZones(true)">All</button>
+                <button type="button" class="multiselect-action-btn" onclick="selectAllZones(false)">None</button>
+              </div>
+            </div>
+            <div class="multiselect-list" id="zone-checkbox-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
       </div>
 
+      <!-- Quick Focus Filter renamed to Diagnosis with Full Disease Names -->
       <div class="filter-group">
-        <span class="filter-label"><i data-lucide="filter" style="width:14px;height:14px"></i> Quick Focus:</span>
-        <div class="filter-pills">
-          <button class="pill-btn active" onclick="setQuickDiagnosis('ALL', this)">All</button>
-          <button class="pill-btn" onclick="setQuickDiagnosis('Acute Gastroenteritis (AGE)', this)">AGE (337)</button>
-          <button class="pill-btn" onclick="setQuickDiagnosis('Acute Diarrhoeal Disease (ADD)', this)">ADD (111)</button>
-          <button class="pill-btn" onclick="setQuickDiagnosis('Hepatitis A', this)">Hepatitis A (28)</button>
-          <button class="pill-btn" onclick="setQuickDiagnosis('Cholera', this)">Cholera (9)</button>
-          <button class="pill-btn" onclick="setQuickDiagnosis('Typhoid / Enteric Fever', this)">Typhoid (14)</button>
+        <span class="filter-label"><i data-lucide="stethoscope" style="width:14px;height:14px"></i> Diagnosis:</span>
+        <div class="filter-pills" id="diagnosis-pills-container">
+          <button class="pill-btn active" onclick="setDiagnosisFilter('ALL', this)">All Diagnoses</button>
+          <button class="pill-btn" onclick="setDiagnosisFilter('Acute Gastroenteritis (AGE)', this)" id="pill-age">Acute Gastroenteritis (AGE)</button>
+          <button class="pill-btn" onclick="setDiagnosisFilter('Acute Diarrhoeal Disease (ADD)', this)" id="pill-add">Acute Diarrhoeal Disease (ADD)</button>
+          <button class="pill-btn" onclick="setDiagnosisFilter('Hepatitis A', this)" id="pill-hepa">Acute Hepatitis A</button>
+          <button class="pill-btn" onclick="setDiagnosisFilter('Typhoid / Enteric Fever', this)" id="pill-typhoid">Typhoid / Enteric Fever</button>
+          <button class="pill-btn" onclick="setDiagnosisFilter('Cholera', this)" id="pill-cholera">Cholera</button>
+          <button class="pill-btn" onclick="setDiagnosisFilter('Dysentery', this)" id="pill-dysentery">Dysentery</button>
         </div>
       </div>
     </div>
@@ -1421,9 +1607,11 @@
     // State management
     const rawData = window.SURVEILLANCE_DATA;
     let currentFilters = {
-      month: 'ALL',
-      zone: 'ALL',
-      diagnosis: 'ALL',
+      months: [],       // Array of selected month strings e.g. ["Jul 2025", "Aug 2025"], empty = all
+      dateFrom: '',     // YYYY-MM-DD
+      dateTo: '',       // YYYY-MM-DD
+      zones: [],        // Array of selected zone strings e.g. ["Zone 1", "Zone 3"], empty = all
+      diagnosis: 'ALL', // 'ALL' or specific full diagnosis category
       search: ''
     };
 
@@ -1491,27 +1679,33 @@
       lucide.createIcons();
     });
 
-    // Populate Filter Dropdowns
+    // Populate Multi-Select Filter Dropdowns & Diagnosis Pill Counts
     function initFilterDropdowns() {
-      const monthSelect = document.getElementById('filter-month');
-      const zoneSelect = document.getElementById('filter-zone');
-      const diagSelect = document.getElementById('filter-diagnosis');
+      // 1. Month Multi-Select List
+      const monthListContainer = document.getElementById('month-checkbox-list');
+      monthListContainer.innerHTML = '';
+      const monthOrder = ["Jul 2025","Aug 2025","Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026","Jul 2026","Aug 2026","Sep 2026"];
+      
+      monthOrder.forEach(m => {
+        const count = rawData.linelist.filter(x => x.month === m).length;
+        const itemDiv = document.createElement('label');
+        itemDiv.className = 'multiselect-item';
+        itemDiv.innerHTML = `
+          <input type="checkbox" value="${m}" onchange="onMonthCheckChange()" checked />
+          <span>${m}</span>
+          <span class="multiselect-item-count">${count}</span>
+        `;
+        monthListContainer.appendChild(itemDiv);
+      });
+      // Initialize currentFilters.months with all months
+      currentFilters.months = [...monthOrder];
+      updateMonthButtonLabel();
+
+      // 2. Zone Multi-Select List
+      const zoneListContainer = document.getElementById('zone-checkbox-list');
+      zoneListContainer.innerHTML = '';
       const mapZoneJump = document.getElementById('map-zone-quickjump');
 
-      // Unique Months
-      const months = [...new Set(rawData.linelist.map(x => x.month))].filter(Boolean);
-      // Sort chronologically based on clean_data.json
-      const monthOrder = ["Jul 2025","Aug 2025","Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026","Jul 2026","Aug 2026","Sep 2026"];
-      months.sort((a,b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
-
-      months.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m;
-        opt.textContent = m;
-        monthSelect.appendChild(opt);
-      });
-
-      // Unique Zones
       const zones = [...new Set(rawData.linelist.map(x => x.zone))].filter(Boolean).sort((a,b) => {
         const numA = parseInt(a.replace(/\D/g,'')) || 99;
         const numB = parseInt(b.replace(/\D/g,'')) || 99;
@@ -1520,28 +1714,174 @@
 
       zones.forEach(z => {
         const zName = ZONE_NAMES[z] ? `${z} (${ZONE_NAMES[z]})` : z;
-        const opt = document.createElement('option');
-        opt.value = z;
-        opt.textContent = zName;
-        zoneSelect.appendChild(opt);
+        const count = rawData.linelist.filter(x => x.zone === z).length;
 
-        if (z.startsWith('Zone ')) {
+        const itemDiv = document.createElement('label');
+        itemDiv.className = 'multiselect-item';
+        itemDiv.innerHTML = `
+          <input type="checkbox" value="${z}" onchange="onZoneCheckChange()" checked />
+          <span>${zName}</span>
+          <span class="multiselect-item-count">${count}</span>
+        `;
+        zoneListContainer.appendChild(itemDiv);
+
+        if (mapZoneJump && z.startsWith('Zone ')) {
           const optMap = document.createElement('option');
           optMap.value = z;
           optMap.textContent = zName;
           mapZoneJump.appendChild(optMap);
         }
       });
+      // Initialize currentFilters.zones with all zones
+      currentFilters.zones = [...zones];
+      updateZoneButtonLabel();
 
-      // Unique Diagnoses Categories
-      const diagnoses = [...new Set(rawData.linelist.map(x => x.diagnosisCategory))].filter(Boolean).sort();
-      diagnoses.forEach(d => {
-        const count = rawData.linelist.filter(x => x.diagnosisCategory === d).length;
-        const opt = document.createElement('option');
-        opt.value = d;
-        opt.textContent = `${d} (${count})`;
-        diagSelect.appendChild(opt);
+      // 3. Update Diagnosis pill counts with full disease names
+      updateDiagnosisPillCounts();
+
+      // Global document listener to close dropdowns when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#month-multiselect')) {
+          const mMenu = document.getElementById('month-multiselect-menu');
+          const mBtn = document.getElementById('month-multiselect-btn');
+          if (mMenu) mMenu.classList.remove('show');
+          if (mBtn) mBtn.classList.remove('active');
+        }
+        if (!e.target.closest('#zone-multiselect')) {
+          const zMenu = document.getElementById('zone-multiselect-menu');
+          const zBtn = document.getElementById('zone-multiselect-btn');
+          if (zMenu) zMenu.classList.remove('show');
+          if (zBtn) zBtn.classList.remove('active');
+        }
       });
+    }
+
+    // Toggle custom dropdown visibility
+    function toggleDropdown(menuId, event) {
+      if (event) event.stopPropagation();
+      const menu = document.getElementById(menuId);
+      const isShown = menu.classList.contains('show');
+
+      // Close all first
+      document.querySelectorAll('.multiselect-menu').forEach(m => m.classList.remove('show'));
+      document.querySelectorAll('.multiselect-btn').forEach(b => b.classList.remove('active'));
+
+      if (!isShown) {
+        menu.classList.add('show');
+        const btnId = menuId.replace('-menu', '-btn');
+        const btn = document.getElementById(btnId);
+        if (btn) btn.classList.add('active');
+      }
+    }
+
+    // Month Multi-select handlers
+    function onMonthCheckChange() {
+      const checkedBoxes = Array.from(document.querySelectorAll('#month-checkbox-list input[type="checkbox"]:checked'));
+      currentFilters.months = checkedBoxes.map(cb => cb.value);
+      updateMonthButtonLabel();
+      applyFilters();
+    }
+
+    function selectAllMonths(select) {
+      document.querySelectorAll('#month-checkbox-list input[type="checkbox"]').forEach(cb => {
+        cb.checked = !!select;
+      });
+      onMonthCheckChange();
+    }
+
+    function updateMonthButtonLabel() {
+      const label = document.getElementById('month-multiselect-label');
+      const allCheckboxes = document.querySelectorAll('#month-checkbox-list input[type="checkbox"]');
+      const total = allCheckboxes.length;
+      const count = currentFilters.months.length;
+
+      if (count === 0) {
+        label.textContent = "No Months Selected";
+      } else if (count === total) {
+        label.textContent = `All Months (${total} Selected)`;
+      } else if (count <= 2) {
+        label.textContent = currentFilters.months.join(', ');
+      } else {
+        label.textContent = `${count} Months Selected`;
+      }
+    }
+
+    // Zone Multi-select handlers
+    function onZoneCheckChange() {
+      const checkedBoxes = Array.from(document.querySelectorAll('#zone-checkbox-list input[type="checkbox"]:checked'));
+      currentFilters.zones = checkedBoxes.map(cb => cb.value);
+      updateZoneButtonLabel();
+      applyFilters();
+    }
+
+    function selectAllZones(select) {
+      document.querySelectorAll('#zone-checkbox-list input[type="checkbox"]').forEach(cb => {
+        cb.checked = !!select;
+      });
+      onZoneCheckChange();
+    }
+
+    function updateZoneButtonLabel() {
+      const label = document.getElementById('zone-multiselect-label');
+      const allCheckboxes = document.querySelectorAll('#zone-checkbox-list input[type="checkbox"]');
+      const total = allCheckboxes.length;
+      const count = currentFilters.zones.length;
+
+      if (count === 0) {
+        label.textContent = "No Zones Selected";
+      } else if (count === total) {
+        label.textContent = `All Zones (City-Wide)`;
+      } else if (count <= 2) {
+        label.textContent = currentFilters.zones.join(', ');
+      } else {
+        label.textContent = `${count} Zones Selected`;
+      }
+    }
+
+    // Clear calendar date range
+    function clearDateRange() {
+      document.getElementById('filter-date-from').value = '';
+      document.getElementById('filter-date-to').value = '';
+      currentFilters.dateFrom = '';
+      currentFilters.dateTo = '';
+      applyFilters();
+    }
+
+    // Update Diagnosis pills with full disease names & live counts
+    function updateDiagnosisPillCounts() {
+      const countAge = rawData.linelist.filter(x => x.diagnosisCategory === 'Acute Gastroenteritis (AGE)').length;
+      const countAdd = rawData.linelist.filter(x => x.diagnosisCategory === 'Acute Diarrhoeal Disease (ADD)').length;
+      const countHepA = rawData.linelist.filter(x => x.diagnosisCategory === 'Hepatitis A').length;
+      const countTyphoid = rawData.linelist.filter(x => x.diagnosisCategory === 'Typhoid / Enteric Fever').length;
+      const countCholera = rawData.linelist.filter(x => x.diagnosisCategory === 'Cholera').length;
+      const countDysentery = rawData.linelist.filter(x => x.diagnosisCategory === 'Dysentery').length;
+
+      const pAge = document.getElementById('pill-age');
+      const pAdd = document.getElementById('pill-add');
+      const pHepA = document.getElementById('pill-hepa');
+      const pTyphoid = document.getElementById('pill-typhoid');
+      const pCholera = document.getElementById('pill-cholera');
+      const pDysentery = document.getElementById('pill-dysentery');
+
+      if (pAge) pAge.textContent = `Acute Gastroenteritis (AGE) (${countAge})`;
+      if (pAdd) pAdd.textContent = `Acute Diarrhoeal Disease (ADD) (${countAdd})`;
+      if (pHepA) pHepA.textContent = `Acute Hepatitis A (${countHepA})`;
+      if (pTyphoid) pTyphoid.textContent = `Typhoid / Enteric Fever (${countTyphoid})`;
+      if (pCholera) pCholera.textContent = `Cholera (${countCholera})`;
+      if (pDysentery) pDysentery.textContent = `Dysentery (${countDysentery})`;
+    }
+
+    // Set Diagnosis Filter via Pills
+    function setDiagnosisFilter(diag, btn) {
+      document.querySelectorAll('#diagnosis-pills-container .pill-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      currentFilters.diagnosis = diag;
+      applyFilters();
+    }
+
+    // Legacy alias in case invoked elsewhere
+    function setQuickDiagnosis(diag, btn) {
+      setDiagnosisFilter(diag, btn);
     }
 
     // Outbreak Ticker Setup
@@ -1572,38 +1912,54 @@
 
     // Filter Logic
     function applyFilters() {
-      currentFilters.month = document.getElementById('filter-month').value;
-      currentFilters.zone = document.getElementById('filter-zone').value;
-      currentFilters.diagnosis = document.getElementById('filter-diagnosis').value;
+      currentFilters.dateFrom = document.getElementById('filter-date-from')?.value || '';
+      currentFilters.dateTo = document.getElementById('filter-date-to')?.value || '';
 
       updateDashboardData();
     }
 
-    function setQuickDiagnosis(diag, btn) {
-      document.querySelectorAll('.filter-pills .pill-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('filter-diagnosis').value = diag;
-      applyFilters();
-    }
-
     function resetAllFilters() {
-      document.getElementById('filter-month').value = 'ALL';
-      document.getElementById('filter-zone').value = 'ALL';
-      document.getElementById('filter-diagnosis').value = 'ALL';
-      document.getElementById('table-search').value = '';
-      currentFilters = { month: 'ALL', zone: 'ALL', diagnosis: 'ALL', search: '' };
-      document.querySelectorAll('.filter-pills .pill-btn').forEach(b => b.classList.remove('active'));
-      document.querySelector('.filter-pills .pill-btn').classList.add('active');
+      // Re-check all month checkboxes
+      selectAllMonths(true);
+      // Re-check all zone checkboxes
+      selectAllZones(true);
+      // Clear date inputs
+      document.getElementById('filter-date-from').value = '';
+      document.getElementById('filter-date-to').value = '';
+      currentFilters.dateFrom = '';
+      currentFilters.dateTo = '';
+      // Reset diagnosis
+      currentFilters.diagnosis = 'ALL';
+      document.querySelectorAll('#diagnosis-pills-container .pill-btn').forEach(b => b.classList.remove('active'));
+      const firstPill = document.querySelector('#diagnosis-pills-container .pill-btn');
+      if (firstPill) firstPill.classList.add('active');
+      // Reset table search
+      const searchBox = document.getElementById('table-search');
+      if (searchBox) searchBox.value = '';
+      currentFilters.search = '';
+
       linelistPage = 1;
       updateDashboardData();
     }
 
     function updateDashboardData() {
+      const hasMonthFilter = currentFilters.months && currentFilters.months.length > 0;
+      const hasZoneFilter = currentFilters.zones && currentFilters.zones.length > 0;
+      const dFrom = currentFilters.dateFrom;
+      const dTo = currentFilters.dateTo;
+
       // Filter Linelist
       filteredLinelist = rawData.linelist.filter(item => {
-        if (currentFilters.month !== 'ALL' && item.month !== currentFilters.month) return false;
-        if (currentFilters.zone !== 'ALL' && item.zone !== currentFilters.zone) return false;
+        // Month multiselect
+        if (hasMonthFilter && !currentFilters.months.includes(item.month)) return false;
+        // Zone multiselect
+        if (hasZoneFilter && !currentFilters.zones.includes(item.zone)) return false;
+        // Date range filter
+        if (dFrom && item.admissionDate && item.admissionDate < dFrom) return false;
+        if (dTo && item.admissionDate && item.admissionDate > dTo) return false;
+        // Diagnosis filter
         if (currentFilters.diagnosis !== 'ALL' && item.diagnosisCategory !== currentFilters.diagnosis) return false;
+        // Search filter
         if (currentFilters.search) {
           const q = currentFilters.search.toLowerCase();
           const match = (item.name && item.name.toLowerCase().includes(q)) ||
@@ -1618,14 +1974,14 @@
 
       // Filter Events & Outbreaks
       const filteredEvents = rawData.events.filter(e => {
-        if (currentFilters.month !== 'ALL' && e.month !== currentFilters.month) return false;
-        if (currentFilters.zone !== 'ALL' && e.zone !== currentFilters.zone) return false;
+        if (hasMonthFilter && !currentFilters.months.includes(e.month)) return false;
+        if (hasZoneFilter && !currentFilters.zones.includes(e.zone)) return false;
         return true;
       });
 
       const filteredOutbreaks = rawData.outbreaks.filter(o => {
-        if (currentFilters.month !== 'ALL' && o.month !== currentFilters.month) return false;
-        if (currentFilters.zone !== 'ALL' && o.zone !== currentFilters.zone) return false;
+        if (hasMonthFilter && !currentFilters.months.includes(o.month)) return false;
+        if (hasZoneFilter && !currentFilters.zones.includes(o.zone)) return false;
         return true;
       });
 
