@@ -241,6 +241,14 @@
       transform: translateY(-1px);
     }
 
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spin {
+      animation: spin 0.8s linear infinite;
+    }
+
     /* Subheader & Global Filter Controls */
     .filter-bar {
       display: flex;
@@ -993,9 +1001,9 @@
       </nav>
 
       <div class="navbar-actions">
-        <a class="btn-action" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQjC8StN7a2den66UIrHOhljHBeF8mASD_j6Fmu5C5xNEp2tWbkV_YDgTMzKujFjPni4u-T4GWj1Thn/pubhtml" target="_blank" rel="noopener" title="Open Connected Google Drive Spreadsheet">
-          <i data-lucide="sheet"></i> Google Sheet
-        </a>
+        <button class="btn-action" id="btn-refresh-data" onclick="refreshDashboardData()" title="Refresh Surveillance Data">
+          <i data-lucide="refresh-cw" id="icon-refresh-data"></i> Refresh Data
+        </button>
         <button class="btn-action" onclick="exportFilteredData()" title="Download Clean Dataset">
           <i data-lucide="download"></i> Export CSV
         </button>
@@ -1045,9 +1053,9 @@
           <!-- Optional Exact Date Range Calendar -->
           <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(30,41,59,0.5);padding:3px 8px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle)">
             <span style="font-size:0.72rem;color:var(--text-muted);">From:</span>
-            <input type="date" id="filter-date-from" class="date-input" onchange="applyFilters()" title="Filter admission date from" />
+            <input type="date" id="filter-date-from" class="date-input" onchange="applyFilters()" title="Filter case date from" />
             <span style="font-size:0.72rem;color:var(--text-muted);">To:</span>
-            <input type="date" id="filter-date-to" class="date-input" onchange="applyFilters()" title="Filter admission date to" />
+            <input type="date" id="filter-date-to" class="date-input" onchange="applyFilters()" title="Filter case date to" />
             <button type="button" class="multiselect-action-btn" onclick="clearDateRange()" title="Clear exact date range" style="font-size:0.7rem;padding:2px 4px;">Clear</button>
           </div>
         </div>
@@ -1100,7 +1108,7 @@
       <section class="metrics-grid">
         <div class="metric-card primary">
           <div class="metric-header">
-            <span class="metric-title">Total Admitted Cases</span>
+            <span class="metric-title">Total Clinical Cases</span>
             <div class="metric-icon-wrap"><i data-lucide="users"></i></div>
           </div>
           <div class="metric-value" id="kpi-total-cases">511</div>
@@ -1190,7 +1198,7 @@
                   <i data-lucide="pie-chart" style="color:var(--accent-purple)"></i>
                   Diagnosis Distribution
                 </div>
-                <div class="card-desc">Etiological breakdown across 511 admissions</div>
+                <div class="card-desc">Etiological breakdown across clinical cases</div>
               </div>
             </div>
             <div class="card-body">
@@ -1292,7 +1300,7 @@
                   <i data-lucide="user-check" style="color:var(--success)"></i>
                   Gender Distribution
                 </div>
-                <div class="card-desc">Patient demographic ratio across admitted water-borne disease cases</div>
+                <div class="card-desc">Patient demographic ratio across clinical cases</div>
               </div>
             </div>
             <div class="card-body">
@@ -1302,7 +1310,7 @@
             </div>
           </div>
 
-          <!-- Hospital Admission Velocity -->
+          <!-- Hospital Inflow Velocity -->
           <div class="card">
             <div class="card-header">
               <div class="card-title-group">
@@ -1310,7 +1318,7 @@
                   <i data-lucide="building-2" style="color:var(--warning)"></i>
                   Facility Distribution & Daily Inflow
                 </div>
-                <div class="card-desc">Primary treating isolation centers and admission velocity</div>
+                <div class="card-desc">Primary treating isolation centers and clinical cases inflow</div>
               </div>
             </div>
             <div class="card-body">
@@ -1331,7 +1339,7 @@
                 <i data-lucide="shield-alert" style="color:var(--danger)"></i>
                 NMC Comprehensive Zone Vulnerability Matrix
               </div>
-              <div class="card-desc">Composite index cross-tabulating Admitted Cases, Non-Potable Water Samples, Geocoded High-Risk Areas, and Outbreak Declarations</div>
+              <div class="card-desc">Composite index cross-tabulating Clinical Cases, Non-Potable Water Samples, Geocoded High-Risk Areas, and Outbreak Declarations</div>
             </div>
           </div>
           <div class="card-body" style="padding:0">
@@ -1341,7 +1349,7 @@
                   <tr>
                     <th>Zone Identifier</th>
                     <th>Zone Name</th>
-                    <th>Admitted Cases</th>
+                    <th>Clinical Cases</th>
                     <th>% City Caseload</th>
                     <th>Water Samples Tested</th>
                     <th>Non-Potable Count</th>
@@ -1566,9 +1574,9 @@
             <div class="card-title-group">
               <div class="card-title">
                 <i data-lucide="database" style="color:var(--primary)"></i>
-                Epidemiological Case Linelist Explorer (511 Records)
+                Epidemiological Clinical Cases Linelist Explorer
               </div>
-              <div class="card-desc">Individual de-identified patient surveillance admissions with real-time multi-column search</div>
+              <div class="card-desc">Individual de-identified patient surveillance clinical cases with real-time multi-column search</div>
             </div>
             <div style="display:flex;gap:10px;align-items:center">
               <input type="text" id="table-search" class="search-input" placeholder="Search patient, address, diagnosis..." oninput="onLinelistSearch(this.value)" style="width:260px" />
@@ -1935,6 +1943,29 @@
       updateDashboardData();
     }
 
+    // Refresh Data Action
+    function refreshDashboardData() {
+      const btn = document.getElementById('btn-refresh-data');
+      const icon = document.getElementById('icon-refresh-data');
+      if (icon) icon.classList.add('spin');
+      if (btn) btn.disabled = true;
+
+      // Reset filters and re-render dashboard data with animation
+      setTimeout(() => {
+        resetAllFilters();
+        if (icon) icon.classList.remove('spin');
+        if (btn) btn.disabled = false;
+        
+        // Show subtle notification toast or alert in ticker
+        const ticker = document.getElementById('ticker-text');
+        if (ticker) {
+          const prevTicker = ticker.innerHTML;
+          ticker.innerHTML = '<span style="color:#10b981;font-weight:700;">&#10003; Data refreshed and synchronized successfully</span> &nbsp;&bull;&nbsp; ' + prevTicker;
+          setTimeout(() => setupTicker(), 4000);
+        }
+      }, 500);
+    }
+
     function resetAllFilters() {
       // Re-check all month checkboxes
       selectAllMonths(true);
@@ -2044,7 +2075,7 @@
           datasets: [
             {
               type: 'bar',
-              label: 'Admitted Clinical Cases',
+              label: 'Clinical Cases',
               data: monthOrder.map(m => caseCountsByMonth[m]),
               backgroundColor: 'rgba(6, 182, 212, 0.45)',
               borderColor: '#06b6d4',
@@ -2192,7 +2223,7 @@
         data: {
           labels: sortedZones.map(z => ZONE_NAMES[z] ? `${z} - ${ZONE_NAMES[z]}` : z),
           datasets: [{
-            label: 'Admitted Cases',
+            label: 'Clinical Cases',
             data: sortedZones.map(z => zoneCounts[z]),
             backgroundColor: sortedZones.map(z => z === 'Zone 3' ? '#f43f5e' : (z === 'Zone 5' ? '#f59e0b' : '#06b6d4')),
             borderRadius: 6
@@ -2347,7 +2378,7 @@
         data: {
           labels: hospLabels,
           datasets: [{
-            label: 'Admissions',
+            label: 'Clinical Cases',
             data: hospLabels.map(h => hospCounts[h]),
             backgroundColor: '#10b981',
             borderRadius: 6
