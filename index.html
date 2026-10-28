@@ -244,18 +244,25 @@
     /* Subheader & Global Filter Controls */
     .filter-bar {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 32px;
-      background: rgba(15, 23, 42, 0.6);
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px 32px;
+      background: rgba(15, 23, 42, 0.85);
       backdrop-filter: var(--blur);
       border-bottom: 1px solid var(--border-subtle);
+      position: relative;
+      z-index: 500;
+    }
+
+    .filter-row {
+      display: flex;
+      align-items: center;
       gap: 16px;
+      flex-wrap: wrap;
     }
 
     .filter-group {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
@@ -263,13 +270,14 @@
 
     .filter-label {
       font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--text-muted);
+      font-weight: 700;
+      color: #94a3b8;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
+      flex-shrink: 0;
     }
 
     .select-input, .search-input {
@@ -296,7 +304,7 @@
     }
 
     .multiselect-btn {
-      background: rgba(30, 41, 59, 0.8);
+      background: rgba(30, 41, 59, 0.9);
       border: 1px solid var(--border-subtle);
       color: var(--text-primary);
       padding: 6px 14px;
@@ -314,7 +322,8 @@
 
     .multiselect-btn:hover, .multiselect-btn.active {
       border-color: var(--primary);
-      background: rgba(30, 41, 59, 0.95);
+      background: rgba(30, 41, 59, 1);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.25);
     }
 
     .multiselect-btn .btn-text {
@@ -329,15 +338,16 @@
       position: absolute;
       top: calc(100% + 6px);
       left: 0;
-      min-width: 250px;
-      background: #111827;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      min-width: 280px;
+      max-width: 340px;
+      background: #0f172a;
+      border: 1px solid rgba(6, 182, 212, 0.35);
       border-radius: var(--radius-sm);
-      box-shadow: 0 14px 35px -5px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.06);
-      backdrop-filter: blur(20px);
-      z-index: 1100;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(24px);
+      z-index: 2000;
       display: none;
-      padding: 8px;
+      padding: 10px;
     }
 
     .multiselect-menu.show {
@@ -355,8 +365,8 @@
       justify-content: space-between;
       align-items: center;
       padding: 4px 6px 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      margin-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 8px;
       font-size: 0.74rem;
     }
 
@@ -378,11 +388,11 @@
     }
 
     .multiselect-list {
-      max-height: 240px;
+      max-height: 250px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
       padding-right: 4px;
     }
 
@@ -399,7 +409,7 @@
     }
 
     .multiselect-item:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.08);
     }
 
     .multiselect-item input[type="checkbox"] {
@@ -413,7 +423,7 @@
       margin-left: auto;
       font-size: 0.72rem;
       color: var(--text-muted);
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
       padding: 1px 6px;
       border-radius: 9999px;
     }
@@ -1008,70 +1018,77 @@
 
     <!-- Global Filter Bar -->
     <div class="filter-bar">
-      <div class="filter-group">
+      <!-- Row 1: Date, Month & Zone Filters -->
+      <div class="filter-row">
         <!-- Date & Month Calendar Filter with Multiple Selection -->
-        <span class="filter-label"><i data-lucide="calendar" style="width:14px;height:14px"></i> Date & Month:</span>
-        <div class="multiselect-dropdown" id="month-multiselect">
-          <button type="button" class="multiselect-btn" id="month-multiselect-btn" onclick="toggleDropdown('month-multiselect-menu', event)">
-            <span class="btn-text" id="month-multiselect-label">All Months (15 Selected)</span>
-            <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
-          </button>
-          <div class="multiselect-menu" id="month-multiselect-menu">
-            <div class="multiselect-actions-bar">
-              <span style="font-weight:600;color:var(--text-secondary);">Select Months</span>
-              <div>
-                <button type="button" class="multiselect-action-btn" onclick="selectAllMonths(true)">All</button>
-                <button type="button" class="multiselect-action-btn" onclick="selectAllMonths(false)">None</button>
+        <div class="filter-group">
+          <span class="filter-label"><i data-lucide="calendar" style="width:14px;height:14px"></i> Date & Month:</span>
+          <div class="multiselect-dropdown" id="month-multiselect">
+            <button type="button" class="multiselect-btn" id="month-multiselect-btn" onclick="toggleDropdown('month-multiselect-menu', event)">
+              <span class="btn-text" id="month-multiselect-label">All Months (15 Selected)</span>
+              <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
+            </button>
+            <div class="multiselect-menu" id="month-multiselect-menu">
+              <div class="multiselect-actions-bar">
+                <span style="font-weight:600;color:var(--text-secondary);">Select Months</span>
+                <div>
+                  <button type="button" class="multiselect-action-btn" onclick="selectAllMonths(true)">All</button>
+                  <button type="button" class="multiselect-action-btn" onclick="selectAllMonths(false)">None</button>
+                </div>
+              </div>
+              <div class="multiselect-list" id="month-checkbox-list">
+                <!-- Dynamically populated -->
               </div>
             </div>
-            <div class="multiselect-list" id="month-checkbox-list">
-              <!-- Dynamically populated -->
-            </div>
+          </div>
+
+          <!-- Optional Exact Date Range Calendar -->
+          <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(30,41,59,0.5);padding:3px 8px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle)">
+            <span style="font-size:0.72rem;color:var(--text-muted);">From:</span>
+            <input type="date" id="filter-date-from" class="date-input" onchange="applyFilters()" title="Filter admission date from" />
+            <span style="font-size:0.72rem;color:var(--text-muted);">To:</span>
+            <input type="date" id="filter-date-to" class="date-input" onchange="applyFilters()" title="Filter admission date to" />
+            <button type="button" class="multiselect-action-btn" onclick="clearDateRange()" title="Clear exact date range" style="font-size:0.7rem;padding:2px 4px;">Clear</button>
           </div>
         </div>
 
-        <!-- Optional Exact Date Range Calendar -->
-        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(30,41,59,0.5);padding:3px 8px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle)">
-          <span style="font-size:0.72rem;color:var(--text-muted);">From:</span>
-          <input type="date" id="filter-date-from" class="date-input" onchange="applyFilters()" title="Filter admission date from" />
-          <span style="font-size:0.72rem;color:var(--text-muted);">To:</span>
-          <input type="date" id="filter-date-to" class="date-input" onchange="applyFilters()" title="Filter admission date to" />
-          <button type="button" class="multiselect-action-btn" onclick="clearDateRange()" title="Clear exact date range" style="font-size:0.7rem;padding:2px 4px;">Clear</button>
-        </div>
-
         <!-- Zone Multi-Select Filter -->
-        <span class="filter-label" style="margin-left:8px"><i data-lucide="map" style="width:14px;height:14px"></i> Zone:</span>
-        <div class="multiselect-dropdown" id="zone-multiselect">
-          <button type="button" class="multiselect-btn" id="zone-multiselect-btn" onclick="toggleDropdown('zone-multiselect-menu', event)">
-            <span class="btn-text" id="zone-multiselect-label">All Zones (City-Wide)</span>
-            <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
-          </button>
-          <div class="multiselect-menu" id="zone-multiselect-menu">
-            <div class="multiselect-actions-bar">
-              <span style="font-weight:600;color:var(--text-secondary);">Select Zones</span>
-              <div>
-                <button type="button" class="multiselect-action-btn" onclick="selectAllZones(true)">All</button>
-                <button type="button" class="multiselect-action-btn" onclick="selectAllZones(false)">None</button>
+        <div class="filter-group">
+          <span class="filter-label"><i data-lucide="map" style="width:14px;height:14px"></i> Zone:</span>
+          <div class="multiselect-dropdown" id="zone-multiselect">
+            <button type="button" class="multiselect-btn" id="zone-multiselect-btn" onclick="toggleDropdown('zone-multiselect-menu', event)">
+              <span class="btn-text" id="zone-multiselect-label">All Zones (City-Wide)</span>
+              <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
+            </button>
+            <div class="multiselect-menu" id="zone-multiselect-menu">
+              <div class="multiselect-actions-bar">
+                <span style="font-weight:600;color:var(--text-secondary);">Select Zones</span>
+                <div>
+                  <button type="button" class="multiselect-action-btn" onclick="selectAllZones(true)">All</button>
+                  <button type="button" class="multiselect-action-btn" onclick="selectAllZones(false)">None</button>
+                </div>
               </div>
-            </div>
-            <div class="multiselect-list" id="zone-checkbox-list">
-              <!-- Dynamically populated -->
+              <div class="multiselect-list" id="zone-checkbox-list">
+                <!-- Dynamically populated -->
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Quick Focus Filter renamed to Diagnosis with Full Disease Names -->
-      <div class="filter-group">
-        <span class="filter-label"><i data-lucide="stethoscope" style="width:14px;height:14px"></i> Diagnosis:</span>
-        <div class="filter-pills" id="diagnosis-pills-container">
-          <button class="pill-btn active" onclick="setDiagnosisFilter('ALL', this)">All Diagnoses</button>
-          <button class="pill-btn" onclick="setDiagnosisFilter('Acute Gastroenteritis (AGE)', this)" id="pill-age">Acute Gastroenteritis (AGE)</button>
-          <button class="pill-btn" onclick="setDiagnosisFilter('Acute Diarrhoeal Disease (ADD)', this)" id="pill-add">Acute Diarrhoeal Disease (ADD)</button>
-          <button class="pill-btn" onclick="setDiagnosisFilter('Hepatitis A', this)" id="pill-hepa">Acute Hepatitis A</button>
-          <button class="pill-btn" onclick="setDiagnosisFilter('Typhoid / Enteric Fever', this)" id="pill-typhoid">Typhoid / Enteric Fever</button>
-          <button class="pill-btn" onclick="setDiagnosisFilter('Cholera', this)" id="pill-cholera">Cholera</button>
-          <button class="pill-btn" onclick="setDiagnosisFilter('Dysentery', this)" id="pill-dysentery">Dysentery</button>
+      <!-- Row 2: Disease / Diagnosis Filter Pills with Full Names -->
+      <div class="filter-row">
+        <div class="filter-group">
+          <span class="filter-label"><i data-lucide="stethoscope" style="width:14px;height:14px"></i> Diagnosis:</span>
+          <div class="filter-pills" id="diagnosis-pills-container">
+            <button class="pill-btn active" onclick="setDiagnosisFilter('ALL', this)">All Diagnoses</button>
+            <button class="pill-btn" onclick="setDiagnosisFilter('Acute Gastroenteritis (AGE)', this)" id="pill-age">Acute Gastroenteritis (AGE)</button>
+            <button class="pill-btn" onclick="setDiagnosisFilter('Acute Diarrhoeal Disease (ADD)', this)" id="pill-add">Acute Diarrhoeal Disease (ADD)</button>
+            <button class="pill-btn" onclick="setDiagnosisFilter('Hepatitis A', this)" id="pill-hepa">Acute Hepatitis A</button>
+            <button class="pill-btn" onclick="setDiagnosisFilter('Typhoid / Enteric Fever', this)" id="pill-typhoid">Typhoid / Enteric Fever</button>
+            <button class="pill-btn" onclick="setDiagnosisFilter('Cholera', this)" id="pill-cholera">Cholera</button>
+            <button class="pill-btn" onclick="setDiagnosisFilter('Dysentery', this)" id="pill-dysentery">Dysentery</button>
+          </div>
         </div>
       </div>
     </div>
