@@ -808,7 +808,7 @@
             NMC Water-Borne Disease & ADD Surveillance
             <span class="badge-live"><span class="pulse-dot"></span> LIVE SURVEILLANCE</span>
           </h1>
-          <p>Nagpur Municipal Corporation Health Dept. | Epidemiological Registry (Jul 2025 - Aug 2026)</p>
+          <p>Nagpur Municipal Corporation Health Dept. | Epidemiological Registry (Jul 2025 - Sep 2026)</p>
         </div>
       </div>
 
@@ -835,6 +835,9 @@
       </nav>
 
       <div class="navbar-actions">
+        <a class="btn-action" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQjC8StN7a2den66UIrHOhljHBeF8mASD_j6Fmu5C5xNEp2tWbkV_YDgTMzKujFjPni4u-T4GWj1Thn/pubhtml" target="_blank" rel="noopener" title="Open Connected Google Drive Spreadsheet">
+          <i data-lucide="sheet"></i> Google Sheet
+        </a>
         <button class="btn-action" onclick="exportFilteredData()" title="Download Clean Dataset">
           <i data-lucide="download"></i> Export CSV
         </button>
@@ -1498,7 +1501,7 @@
       // Unique Months
       const months = [...new Set(rawData.linelist.map(x => x.month))].filter(Boolean);
       // Sort chronologically based on clean_data.json
-      const monthOrder = ["Jul 2025","Aug 2025","Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026","Jul 2026","Aug 2026"];
+      const monthOrder = ["Jul 2025","Aug 2025","Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026","Jul 2026","Aug 2026","Sep 2026"];
       months.sort((a,b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
 
       months.forEach(m => {
@@ -1645,7 +1648,7 @@
     // Overview Charts
     function renderOverviewCharts() {
       // 1. Correlation Chart: Monthly Cases vs Contamination Rate
-      const monthOrder = ["Jul 2025","Aug 2025","Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026","Jul 2026","Aug 2026"];
+      const monthOrder = ["Jul 2025","Aug 2025","Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026","Jul 2026","Aug 2026","Sep 2026"];
       
       const caseCountsByMonth = {};
       monthOrder.forEach(m => caseCountsByMonth[m] = 0);
@@ -1825,7 +1828,7 @@
 
     // Trends Tab Charts
     function renderTrendsCharts() {
-      const monthOrder = ["Jul 2025","Aug 2025","Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026","Jul 2026","Aug 2026"];
+      const monthOrder = ["Jul 2025","Aug 2025","Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026","Jul 2026","Aug 2026","Sep 2026"];
       const categories = [
         { name: 'Acute Gastroenteritis (AGE)', color: '#06b6d4' },
         { name: 'Acute Diarrhoeal Disease (ADD)', color: '#3b82f6' },
